@@ -8,11 +8,19 @@ from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ApplicationBuilder, MessageHandler, CallbackQueryHandler, ContextTypes, filters, CommandHandler
 
 TOKEN = input("🔑 ادخل توكن البوت: ").strip()
+SESSION_ID = input("🍪 ادخل sessionid حق الانستغرام: ").strip()
 OWNER_ID = 5057151278
+
+# إنشاء ملف cookies
+with open("cookies.txt", "w") as f:
+    f.write(f"# Netscape HTTP Cookie File\n.instagram.com\tTRUE\t/\tFALSE\t0\tsessionid\t{SESSION_ID}\n")
 
 url_regex = re.compile(r'https?://')
 
 loader = Instaloader()
+
+# تفعيل sessionid داخل instaloader
+loader.context._session.cookies.set("sessionid", SESSION_ID, domain=".instagram.com")
 
 def fix_tiktok_url(url):
     try:
@@ -154,7 +162,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     await rocket.delete()
                     return
 
-            with yt_dlp.YoutubeDL({"quiet": True}) as ydl:
+            with yt_dlp.YoutubeDL({"quiet": True, "cookiefile": "cookies.txt"}) as ydl:
                 info = ydl.extract_info(url, download=False)
 
             image_urls = []
@@ -181,7 +189,8 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             ydl_opts = {
                 "format": "best",
                 "outtmpl": "video.%(ext)s",
-                "quiet": True
+                "quiet": True,
+                "cookiefile": "cookies.txt"
             }
 
             with yt_dlp.YoutubeDL(ydl_opts) as ydl:
@@ -202,7 +211,8 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             ydl_opts = {
                 "format": "bestaudio/best",
                 "outtmpl": "voice.%(ext)s",
-                "quiet": True
+                "quiet": True,
+                "cookiefile": "cookies.txt"
             }
 
             with yt_dlp.YoutubeDL(ydl_opts) as ydl:
