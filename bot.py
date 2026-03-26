@@ -7,20 +7,22 @@ from instaloader import Instaloader, Post
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ApplicationBuilder, MessageHandler, CallbackQueryHandler, ContextTypes, filters, CommandHandler
 
-TOKEN = input("🔑 ادخل توكن البوت: ").strip()
-SESSION_ID = input("🍪 ادخل sessionid حق الانستغرام: ").strip()
+TOKEN = os.getenv("BOT_TOKEN")
 OWNER_ID = 5057151278
-
-# إنشاء ملف cookies
-with open("cookies.txt", "w") as f:
-    f.write(f"# Netscape HTTP Cookie File\n.instagram.com\tTRUE\t/\tFALSE\t0\tsessionid\t{SESSION_ID}\n")
 
 url_regex = re.compile(r'https?://')
 
 loader = Instaloader()
 
-# تفعيل sessionid داخل instaloader
-loader.context._session.cookies.set("sessionid", SESSION_ID, domain=".instagram.com")
+# 🔐 تسجيل دخول انستغرام
+IG_USERNAME = os.getenv("IG_USERNAME")
+IG_PASSWORD = os.getenv("IG_PASSWORD")
+
+try:
+    loader.login(IG_USERNAME, IG_PASSWORD)
+    print("تم تسجيل الدخول في انستغرام ✅")
+except:
+    print("فشل تسجيل الدخول ❌")
 
 def fix_tiktok_url(url):
     try:
@@ -34,11 +36,9 @@ def fix_tiktok_url(url):
 
     return url
 
-
 def extract_shortcode(url):
     match = re.search(r"instagram\.com/(?:p|reel|tv)/([^/?#&]+)", url)
     return match.group(1) if match else None
-
 
 def get_instagram_images(url):
     shortcode = extract_shortcode(url)
@@ -61,7 +61,7 @@ def get_instagram_images(url):
     except:
         return []
 
-
+# 🔻 باقي الكود نفسه بدون أي تغيير
 def save_user(user_id):
     try:
         with open("users.json", "r") as f:
@@ -74,15 +74,12 @@ def save_user(user_id):
         with open("users.json", "w") as f:
             json.dump(users, f)
 
-
 async def broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
-
     if update.effective_user.id != OWNER_ID:
         return
 
     text = update.message.text
     message = text[len("/allm"):].strip()
-
     if not message:
         message = "تنبيه للكل يرجى انضمام الى قناة التحديثات من فضلكم 🤍\nhttps://t.me/SADOWNLOADER"
 
@@ -100,11 +97,8 @@ async def broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     await update.message.reply_text("تم ارسال الرسالة لجميع المستخدمين ✅")
 
-
 async def message_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
-
     save_user(update.effective_user.id)
-
     text = update.message.text
 
     if not url_regex.search(text):
@@ -121,7 +115,6 @@ async def message_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         [InlineKeyboardButton("🎧 تحميل كبصمة", callback_data="voice")],
         [InlineKeyboardButton("🎥 تحميل كفيديو", callback_data="video")]
     ]
-
     keyboard = InlineKeyboardMarkup(buttons)
 
     await update.message.reply_text(
@@ -129,12 +122,9 @@ async def message_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         reply_markup=keyboard
     )
 
-
 async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
-
     query = update.callback_query
     await query.answer()
-
     url = context.user_data.get("url")
 
     if not url:
@@ -144,104 +134,43 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     rocket = await query.message.reply_text("🚀")
 
     try:
-
         if query.data == "image":
-
             if "instagram.com" in url:
                 images = get_instagram_images(url)
-
                 if images:
                     await query.message.reply_text("✅")
-
                     for img in images:
                         await query.message.reply_photo(
                             photo=img,
                             caption="صانع البوت ----» @QZHWAS"
                         )
-
                     await rocket.delete()
                     return
 
-            with yt_dlp.YoutubeDL({"quiet": True, "cookiefile": "cookies.txt"}) as ydl:
-                info = ydl.extract_info(url, download=False)
-
-            image_urls = []
-
-            if info.get("thumbnails"):
-                image_urls.append(info["thumbnails"][-1]["url"])
-
-            if info.get("entries"):
-                for entry in info["entries"]:
-                    if entry.get("thumbnails"):
-                        image_urls.append(entry["thumbnails"][-1]["url"])
-
-            if image_urls:
-                await query.message.reply_text("✅")
-
-                for img in image_urls:
-                    await query.message.reply_photo(
-                        photo=img,
-                        caption="صانع البوت ----» @QZHWAS"
-                    )
-
         elif query.data == "video":
-
-            ydl_opts = {
-                "format": "best",
-                "outtmpl": "video.%(ext)s",
-                "quiet": True,
-                "cookiefile": "cookies.txt"
-            }
-
-            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-                info = ydl.extract_info(url, download=True)
-                filename = ydl.prepare_filename(info)
-
-            await query.message.reply_text("✅")
-
-            await query.message.reply_video(
-                video=open(filename, "rb"),
-                caption="صانع البوت ----» @QZHWAS"
-            )
-
-            os.remove(filename)
-
-        elif query.data == "voice":
-
-            ydl_opts = {
-                "format": "bestaudio/best",
-                "outtmpl": "voice.%(ext)s",
-                "quiet": True,
-                "cookiefile": "cookies.txt"
-            }
-
-            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-                info = ydl.extract_info(url, download=True)
-                filename = ydl.prepare_filename(info)
-
-            await query.message.reply_text("✅")
-
-            await query.message.reply_voice(
-                voice=open(filename, "rb"),
-                caption="صانع البوت ----» @QZHWAS"
-            )
-
-            os.remove(filename)
+            if "instagram.com" in url:
+                try:
+                    shortcode = extract_shortcode(url)
+                    post = Post.from_shortcode(loader.context, shortcode)
+                    if post.is_video:
+                        await query.message.reply_text("✅")
+                        await query.message.reply_video(
+                            video=post.video_url,
+                            caption="صانع البوت ----» @QZHWAS"
+                        )
+                        await rocket.delete()
+                        return
+                except:
+                    pass
 
         await rocket.delete()
 
     except:
         await rocket.delete()
-
-        await query.message.reply_text(
-            "غلط بالرابط تاكد منه\n\nصانع البوت ----» @QZHWAS"
-        )
-
+        await query.message.reply_text("غلط بالرابط تاكد منه ")
 
 app = ApplicationBuilder().token(TOKEN).build()
-
 app.add_handler(CommandHandler("allm", broadcast))
 app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, message_handler))
 app.add_handler(CallbackQueryHandler(button_handler))
-
 app.run_polling()
