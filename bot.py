@@ -102,7 +102,7 @@ async def message_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if not url_regex.search(text):
         await update.message.reply_text(
-            "حبيبي حط رابط تضحك عليه انته ههههههههههههههههههههههههههههههههه\n\nصانع البوت ----» @QZHWAS"
+            "حبيبي حط رابط تضحك عليه انته ههههههههههههههههههههههههههههههههه\n\nصانع البوت ----» @wi6j1"
         )
         return
 
@@ -117,7 +117,7 @@ async def message_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyboard = InlineKeyboardMarkup(buttons)
 
     await update.message.reply_text(
-        "اختر نوع التحميل\n\nصانع البوت ----» @QZHWAS",
+        "اختر نوع التحميل\n\nصانع البوت ----» @wi6j1",
         reply_markup=keyboard
     )
 
@@ -127,7 +127,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     url = context.user_data.get("url")
 
     if not url:
-        await query.edit_message_text("غلط بالرابط تأكد منه\n\nصانع البوت ----» @QZHWAS")
+        await query.edit_message_text("غلط بالرابط تأكد منه\n\nصانع البوت ----» @wi6j1")
         return
 
     rocket = await query.message.reply_text("🚀")
@@ -142,7 +142,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     for img in images:
                         await query.message.reply_photo(
                             photo=img,
-                            caption="صانع البوت ----» @QZHWAS"
+                            caption="صانع البوت ----» @wi6j1"
                         )
                     await rocket.delete()
                     return
@@ -158,7 +158,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
                         for img in images:
                             await query.message.reply_photo(
                                 photo=img,
-                                caption="صانع البوت ----» @QZHWAS"
+                                caption="صانع البوت ----» @wi6j1"
                             )
                         await rocket.delete()
                         return
@@ -177,7 +177,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
                         await query.message.reply_text("✅")
                         await query.message.reply_photo(
                             photo=thumb,
-                            caption="صانع البوت ----» @QZHWAS"
+                            caption="صانع البوت ----» @wi6j1"
                         )
                         await rocket.delete()
                         return
@@ -194,7 +194,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
                         await query.message.reply_text("✅")
                         await query.message.reply_video(
                             video=post.video_url,
-                            caption="صانع البوت ----» @QZHWAS"
+                            caption="صانع البوت ----» @wi6j1"
                         )
                         await rocket.delete()
                         return
@@ -219,7 +219,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
             await query.message.reply_video(
                 video=open(filename, "rb"),
-                caption="صانع البوت ----» @QZHWAS"
+                caption="صانع البوت ----» @wi6j1"
             )
 
             os.remove(filename)
@@ -245,7 +245,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
             await query.message.reply_voice(
                 voice=open(filename, "rb"),
-                caption="صانع البوت ----» @QZHWAS"
+                caption="صانع البوت ----» @wi6j1"
             )
 
             os.remove(filename)
