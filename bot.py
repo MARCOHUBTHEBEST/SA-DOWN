@@ -10,7 +10,7 @@ from instaloader import Instaloader, Post
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, InputMediaPhoto, ReactionTypeEmoji
 from telegram.ext import ApplicationBuilder, MessageHandler, CallbackQueryHandler, ContextTypes, filters, CommandHandler
 
-TOKEN = os.getgenv("TOKEN")
+TOKEN = os.getenv("TOKEN")
 OWNER_ID = 5057151278
 LOADING_GIF = "CgACAgUAAxkBAAIBMGnz9xZHqMJ7lsjGCWNW7dPgCjmEAAJkHwAC56SgV_m6bQ8dFShxOwQ"
 EFFECT_ID = "5159385139981059251"
